@@ -24,12 +24,12 @@ def run(device_id: str, bootstrap_server: str):
     while True:
         streambuf = FakeStreamBuffer(datetime.datetime.now())
         data = streambuf.samples_get(0, 10)
-        producer.send('joulescope_sensor_data', {
-            'device_id': device_id,
-            'data': data
-        })
+        producer.send(
+            'joulescope_sensor_data',
+            key=device_id.encode('utf-8'),
+            value={'data': data}
+        )
         time.sleep(10)
-
 
 
 if __name__ == '__main__':
