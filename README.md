@@ -102,3 +102,11 @@ Firstly for data integrity in storage, that would rely on the managed Kafka setu
 
 For transit, I'd implement a different serializer/deserializer that includes a checksum to the message.
 
+To handle data transmission failures, I'd implement a small in-memory circular buffer to store the failed transmissions that gets retried with exponential backoff. For a more resilient solution, it should persist to disk.
+
+
+## 8
+
+For using this system for other applications, a most of the infrastructure will be reusuable. I'd just make sure to document the procedure for reproducing this, and add recommendations on things like naming-conventations, splitting up usecases by schema (Timescale) etc.
+
+On the producer side, I'd make an internal library for other applications to reuse the common code.
