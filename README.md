@@ -22,3 +22,18 @@ However, my experience with Kafka was that it's significantly harder to work wit
 Especially in the age where storage is cheap but engineer-time and compute is expensive,
 I feel that using Kafka more for data transport and leaving querying to a relational database will be easier for users to query.
 
+3) I'll build this system using Apache Kafka as I'm most familiar with this.
+There are other alternatives such as AWS Kinesis, GCP Pubsub, and Azure Event hubs but I feel that sticking with proven open-source technologies is also generally better
+in terms of community support, and being able to test locally without the need of internet access.
+
+For small teams, it's more time-effective for engineers to use managed instances that to operate a kafka cluster (or any other distributed systems).
+
+Therefore deploying to a production system, I'd deploy to one of:
+* Confluent Cloud (managed Kafka)
+* Azure Event Hubs (using kafka compatible API)
+* Deploy a kafka operator to a managed K8s instance.
+
+Specifically for this prototype I'll be using Redpanda, a fully Kafka-compatible system since it's got slightly easier than Apache Kafka for local testing setups.
+
+If I had more time to work on this, I'd fully implement a solution using Kafka Connect to stream changes to a DB like TimescaleDB but Kafka Connect configuration is notoriously finicky and time-consuming.
+
