@@ -35,5 +35,22 @@ Therefore deploying to a production system, I'd deploy to one of:
 
 Specifically for this prototype I'll be using Redpanda, a fully Kafka-compatible system since it's got slightly easier than Apache Kafka for local testing setups.
 
-If I had more time to work on this, I'd fully implement a solution using Kafka Connect to stream changes to a DB like TimescaleDB but Kafka Connect configuration is notoriously finicky and time-consuming.
+If I had more time to work on this, I'd implement a solution using Kafka Connect to stream changes to a DB like TimescaleDB but Kafka Connect configuration is notoriously finicky and time-consuming.
+
+For deploying this to more computers, I'd use Ansible for deploying the kafka producers on the device.
+
+
+4) For any message-level transformations, I'd consider using Kafka Streams if the tranformations need to be done before it gets to the users. For data validation, message level checking can be done in kafka streams or if it requires checking against external data sources, it's probably best to do this in a DB.
+
+5) Depends on the bottleneck. If all 100 devices are running in an on-prem network, there's a high chance that the network could be a bottleneck before it gets to Kafka. In this this case, I'd think about implementing message level compression, and try and get a better network switch.
+
+If the bottleneck is in Kafka, it can be scaled horizontally relatively easily by increasing the number of kafka nodes.
+
+If TimescaleDB was adopted, I'd make sure that it is horizonally scaled in an HA configuration.
+
+6) To answer the question of "Load waveforms produced by two different enery reduction algorithms", we need to know which device, and which algorithm it was running. The easiest way would be to embed this information along with the message sent to Kafka. If that's not possible to do from the the kafka producer, I'd add that information into another topic and join it at query time (i.e. in the DB).
+
+7) Firstly for data integrity in storage, that would rely on the managed Kafka setup as Kafka already provies several strategies for better integrity. Kafka is a distributed immutable log that ensures the replicated data to be in consensus using the Raft algorithm.
+
+For transit, I'd implement a different serializer/deserializer that includes a checksum to the message.
 
