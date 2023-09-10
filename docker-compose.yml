@@ -118,3 +118,16 @@ services:
       CONNECT_HEAP_OPTS: -Xms512M -Xmx512M
       CONNECT_LOG_LEVEL: info
 
+  # My additions
+  device1:
+    build:
+      context: joulescope-faker
+      dockerfile: Dockerfile
+    environment:
+      DEVICE_ID: device-1
+      BOOTSTRAP_SERVER: redpanda:9092
+    depends_on:
+      - redpanda
+    networks:
+      - redpanda_network
+

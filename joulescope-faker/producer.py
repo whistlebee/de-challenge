@@ -40,4 +40,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if not args.device_id or not args.boostrap_server:
         raise ValueError('Device ID or bootstrap server not configured')
+    print(f'{args.device_id=} {args.boostrap_server=}')
     run(args.device_id, args.boostrap_server)
