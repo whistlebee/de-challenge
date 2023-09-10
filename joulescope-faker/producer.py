@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import json
+import os
 import time
 
 import numpy as np
@@ -34,7 +35,9 @@ def run(device_id: str, bootstrap_server: str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('device_id')
-    parser.add_argument('boostrap_server')
+    parser.add_argument('-i', '--device_id', required=False, default=os.environ.get('DEVICE_ID'))
+    parser.add_argument('-b', '--boostrap_server', required=False, default=os.environ.get('BOOTSTRAP_SERVER'))
     args = parser.parse_args()
+    if not args.device_id or not args.boostrap_server:
+        raise ValueError('Device ID or bootstrap server not configured')
     run(args.device_id, args.boostrap_server)
