@@ -3,33 +3,43 @@ import datetime
 import json
 import os
 import time
-
 import numpy as np
-from fake_streambuffer import FakeStreamBuffer
+
+from fake_streambuffer import FakeStreamBuffer, NumpyEncoder, value_serializer
 from kafka import KafkaProducer
 
 
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+def splitter(sample_data: dict):
+    start = sample_data['time']['range']['value'][0]
+    end = sample_data['time']['range']['value'][1]
+
+    num_measurements = len(sample_data['signals']['current']['value'])
+    yield from (
+        {'timestamp': timestamp, 'current': current, 'voltage': voltage}
+        for timestamp, current, voltage in
+        zip(
+            np.linspace(start, end, num_measurements),
+            sample_data['signals']['current']['value'],
+            sample_data['signals']['voltage']['value'],
+        )
+    )
 
 
 def run(device_id: str, bootstrap_server: str):
     producer = KafkaProducer(
         bootstrap_servers=bootstrap_server,
-        value_serializer=lambda v: json.dumps(v, cls=NumpyEncoder).encode('utf-8')
+        value_serializer=value_serializer
     )
 
     while True:
         streambuf = FakeStreamBuffer(datetime.datetime.now())
         data = streambuf.samples_get(0, 10)
-        producer.send(
-            'joulescope_sensor_data',
-            key=device_id.encode('utf-8'),
-            value={'data': data}
-        )
+        for msg in splitter(data):
+            producer.send(
+                'joulescope_sensor_data',
+                key=device_id.encode('utf-8'),
+                value=msg
+            )
         time.sleep(10)
 
 

@@ -1,6 +1,17 @@
 # a fake instance of the StreamBuffer API
 import numpy as np
 from datetime import timedelta, datetime
+import json
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+
+value_serializer=lambda v: json.dumps(v, cls=NumpyEncoder).encode('utf-8')
 
 
 class FakeStreamBuffer:
@@ -44,4 +55,4 @@ class FakeStreamBuffer:
 
 if __name__ == '__main__':
     fsb = FakeStreamBuffer(datetime.now())
-    print(fsb.samples_get(0, 100))
+    print(json.dumps({'data': fsb.samples_get(0, 10)}, cls=NumpyEncoder))
