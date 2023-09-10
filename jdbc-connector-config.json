@@ -1,0 +1,19 @@
+{
+  "name": "jdbc-sink",
+  "config": {
+    "name": "jdbc-sink",
+    "connector.class": "org.apache.camel.kafkaconnector.postgresqlsink.CamelPostgresqlsinkSinkConnector",
+    "tasks.max": "1",
+    "topics": "joulescope_sensor_data",
+    "connection.url": "jdbc:postgresql://timescale:5432/postgres?user=postgres&password=password",
+    "camel.kamelet.postgresql-sink.serverName": "timescale",
+    "camel.kamelet.postgresql-sink.username": "postgres",
+    "camel.kamelet.postgresql-sink.password": "password",
+    "camel.kamelet.postgresql-sink.query": "insert into joulescale_measurements (timestamp, current, voltage) values (to_timestamp(:#timestamp), :#current, :#voltage);",
+    "camel.kamelet.postgresql-sink.databaseName": "postgres",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+    "value.converter.schemas.enable": "false",
+    "key.converter.schemas.enable": "false"
+  }
+}

@@ -34,11 +34,14 @@ def run(device_id: str, bootstrap_server: str):
     while True:
         streambuf = FakeStreamBuffer(datetime.datetime.now())
         data = streambuf.samples_get(0, 10)
-        for msg in splitter(data):
+        for msg in splitter(data, ):
             producer.send(
                 'joulescope_sensor_data',
                 key=device_id.encode('utf-8'),
-                value=msg
+                value={
+                    'device_id': device_id,
+                    **msg
+                }
             )
         time.sleep(10)
 

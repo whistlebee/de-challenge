@@ -99,6 +99,8 @@ services:
       - redpanda
     ports:
       - "8083:8083"
+    volumes:
+     - ./connect-plugins:/opt/kafka/custom-plugins
     environment:
       CONNECT_CONFIGURATION: |
           key.converter=org.apache.kafka.connect.converters.ByteArrayConverter
@@ -117,6 +119,7 @@ services:
       CONNECT_GC_LOG_ENABLED: "false"
       CONNECT_HEAP_OPTS: -Xms512M -Xmx512M
       CONNECT_LOG_LEVEL: info
+      CONNECT_PLUGIN_PATH: /opt/kafka/custom-plugins
 
   # My additions
   device1:
@@ -130,4 +133,18 @@ services:
       - redpanda
     networks:
       - redpanda_network
+
+  timescale:
+    image: timescale/timescaledb-ha:pg14-latest
+    hostname: timescale
+    depends_on:
+      - redpanda
+    networks:
+      - redpanda_network
+    environment:
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./01-create-tables.sql:/docker-entrypoint-initdb.d/01-create-tables.sql
 
